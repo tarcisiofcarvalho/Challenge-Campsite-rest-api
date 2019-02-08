@@ -1,6 +1,11 @@
-package org.campsite.dao;
+package org.campsite.model;
 
 import javax.validation.constraints.*;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,10 +13,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ReservationRequest   {
   
-  private @Valid String fullName = null;
-  private @Valid String email = null;
-  private @Valid String startDate = null;
-  private @Valid String endDate = null;
+  private @Valid String fullName;
+  private @Valid String email;
+  private @Valid @DateTimeFormat(pattern="yyy-mm-dd") Date startDate;
+  private @Valid @DateTimeFormat(pattern="yyy-mm-dd") Date endDate;
 
   @JsonProperty("fullName")
   @NotNull
@@ -33,19 +38,19 @@ public class ReservationRequest   {
 
   @JsonProperty("startDate")
   @NotNull
-  public String getStartDate() {
+  public Date getStartDate() {
     return startDate;
   }
-  public void setStartDate(String startDate) {
+  public void setStartDate(Date startDate) {
     this.startDate = startDate;
   }
   
   @JsonProperty("endDate")
   @NotNull
-  public String getEndDate() {
+  public Date getEndDate() {
     return endDate;
   }
-  public void setEndDate(String endDate) {
+  public void setEndDate(Date endDate) {
     this.endDate = endDate;
   }
 

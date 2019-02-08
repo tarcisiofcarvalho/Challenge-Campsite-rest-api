@@ -1,7 +1,9 @@
-package org.campsite;
+ package org.campsite.controller;
 
-import org.campsite.dao.ReservationRequest;
-import org.campsite.dao.ReservationService;
+import javax.validation.Valid;
+
+import org.campsite.model.ReservationRequest;
+import org.campsite.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +30,7 @@ public class ReservationController {
 	 */
     @GetMapping(path="/{bookingIdentifier}")
     public ResponseEntity<Object> getReservation(@PathVariable String bookingIdentifier) {
-    	return new ResponseEntity<Object>("setup a book identifier", HttpStatus.OK);
+    	return new ResponseEntity<Object>(service.get(bookingIdentifier), HttpStatus.OK);
     }	
 	
 	/**
@@ -37,22 +39,15 @@ public class ReservationController {
 	 * @return bookingIdentifier
 	 */
     @PostMapping
-    public ResponseEntity<Object> addReservation(@RequestBody ReservationRequest rr) {
+    public ResponseEntity<Object> addReservation(@Valid @RequestBody ReservationRequest rr) {
 
-    	//repository.save(new Reservation("12546", rr.getFullName(), rr.getEmail(), rr.getStartDate(), rr.getEndDate())); 	
-    	//ReservationService rs = new ReservationService();
-    	service.save(rr);
-    	//repository.deleteAll();
-    	// Connect DB
-    
-    	// Convert Object to JSON
-    	
-    	// Check if dates were reserved already
-    	
-    	// Save the document
-    	
-    	// Close DB
-    	
+    	try {
+    		service.save(rr); 
+		} catch (Exception e) {
+			//TODO log
+			e.printStackTrace();
+			return new ResponseEntity<Object>("unexpected error", HttpStatus.NOT_MODIFIED);
+		}	
     	
     	return new ResponseEntity<Object>("Reservation Added", HttpStatus.CREATED);
     }
@@ -65,7 +60,16 @@ public class ReservationController {
 	 */
     @PutMapping(path="/{bookingIdentifier}")
     public ResponseEntity<Object> updateReservation(@RequestBody ReservationRequest reservationItem, @PathVariable String bookingIdentifier) {
+    	try {
+    		service.update(reservationItem,bookingIdentifier); 
+		} catch (Exception e) {
+			//TODO log
+			e.printStackTrace();
+			return new ResponseEntity<Object>("unexpected error", HttpStatus.NOT_MODIFIED);
+		}	
+    	
     	return new ResponseEntity<Object>("Reservation updated", HttpStatus.OK);
+ 
     }    
   
 	/**
@@ -75,7 +79,17 @@ public class ReservationController {
 	 */
     @DeleteMapping(path="/{bookingIdentifier}")
     public ResponseEntity<Object> cancelReservation(@PathVariable String bookingIdentifier) {
-    	return new ResponseEntity<Object>("", HttpStatus.OK);
-    }     
+    	try {
+    		service.delete(bookingIdentifier); 
+		} catch (Exception e) {
+			//TODO log
+			e.printStackTrace();
+			return new ResponseEntity<Object>("unexpected error", HttpStatus.NOT_MODIFIED);
+		}	
+    	
+    	return new ResponseEntity<Object>("Reservation cancelled", HttpStatus.OK);    	
+    	
+    	
+    }   
     
 }

@@ -59,7 +59,7 @@ public class ReservationController {
 	 * @return HTTP status code
 	 */
     @PutMapping(path="/{bookingIdentifier}")
-    public ResponseEntity<Object> updateReservation(@RequestBody ReservationRequest reservationItem, @PathVariable String bookingIdentifier) {
+    public ResponseEntity<Object> updateReservation(@Valid @RequestBody ReservationRequest reservationItem, @PathVariable String bookingIdentifier) {
     	try {
     		service.update(reservationItem,bookingIdentifier); 
 		} catch (Exception e) {

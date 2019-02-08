@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Document(collection="reservations")
 public class Reservation{
 	
@@ -18,10 +20,12 @@ public class Reservation{
 	private String fullName;
 	private String email;
 	
-	@DateTimeFormat(pattern="yyyy-MM-dd")
+	@DateTimeFormat(iso = ISO.DATE)
+	@JsonFormat(timezone="GMT-3")
 	private Date startDate;
 	
-	@DateTimeFormat(pattern="yyyy-MM-dd")
+	@DateTimeFormat(iso = ISO.DATE)
+	@JsonFormat(timezone="GMT-3")
 	private Date endDate;
 	
 	@DateTimeFormat(iso = ISO.DATE_TIME)

@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @RestController
 @RequestMapping("/api/v1/availabilities")
 public class AvailabilityController {
@@ -21,7 +23,7 @@ public class AvailabilityController {
 	private ReservationService service;
 	
     @GetMapping
-    public ResponseEntity<Object> getAvailabilities(@RequestParam("startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    public ResponseEntity<Object> getAvailabilities(@RequestParam("startDate") @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date startDate, @RequestParam("endDate") @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date endDate) {
     	List<Date> list;
     	try {
     		list = service.getAvailableDates(startDate, endDate);

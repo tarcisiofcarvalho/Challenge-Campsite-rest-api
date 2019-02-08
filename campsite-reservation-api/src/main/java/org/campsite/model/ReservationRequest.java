@@ -5,9 +5,9 @@ import javax.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
-
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -15,8 +15,8 @@ public class ReservationRequest   {
   
   private @Valid String fullName;
   private @Valid String email;
-  private @Valid @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate;
-  private @Valid @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate;
+  private @Valid @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date startDate;
+  private @Valid @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date endDate;
 
   @JsonProperty("fullName")
   @NotNull

@@ -1,4 +1,5 @@
 package org.campsite.service;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.bson.types.ObjectId;
@@ -30,12 +31,18 @@ public class ReservationService {
 		Hashids hashids = new Hashids(objectId.toString(),8);
 		String bookIdentification = hashids.encode(1L);
  		
+		Calendar endDateCal = Calendar.getInstance();
+		endDateCal.setTime(item.getEndDate());
+		endDateCal.add(Calendar.HOUR_OF_DAY, 23);
+		endDateCal.add(Calendar.MINUTE, 59);
+		endDateCal.add(Calendar.SECOND, 59);
+		
     	Reservation res = new Reservation(objectId, 
     									  bookIdentification, 
     									  item.getFullName(), 
     									  item.getEmail(), 
     									  item.getStartDate(), 
-    									  item.getEndDate(),
+    									  endDateCal.getTime(),
     									  new Date());
     	reservationRepository.save(res);
     }

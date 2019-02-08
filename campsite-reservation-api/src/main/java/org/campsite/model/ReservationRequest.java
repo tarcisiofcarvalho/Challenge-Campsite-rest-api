@@ -15,8 +15,8 @@ public class ReservationRequest   {
   
   private @Valid String fullName;
   private @Valid String email;
-  private @Valid @DateTimeFormat(pattern="yyy-mm-dd") Date startDate;
-  private @Valid @DateTimeFormat(pattern="yyy-mm-dd") Date endDate;
+  private @Valid @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate;
+  private @Valid @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate;
 
   @JsonProperty("fullName")
   @NotNull

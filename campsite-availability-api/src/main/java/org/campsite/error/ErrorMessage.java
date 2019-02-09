@@ -1,30 +1,21 @@
 package org.campsite.error;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 
 public class ErrorMessage {
 	 
     private HttpStatus status;
+    private String exceptionType;
     private String message;
-    private List<String> errors;
  
-    public ErrorMessage(HttpStatus status, String message, List<String> errors) {
+    public ErrorMessage(HttpStatus status, String message, String exceptionType) {
         super();
         this.status = status;
         this.message = message;
-        this.errors = errors;
+        this.exceptionType = exceptionType;
         
     }
- 
-    public ErrorMessage(HttpStatus status, String message, String error) {
-        super();
-        this.status = status;
-        this.message = message;
-        errors = Arrays.asList(error);
-    }
+
 
 	public HttpStatus getStatus() {
 		return status;
@@ -42,11 +33,14 @@ public class ErrorMessage {
 		this.message = message;
 	}
 
-	public List<String> getErrors() {
-		return errors;
+
+	public String getExceptionType() {
+		return exceptionType;
 	}
 
-	public void setErrors(List<String> errors) {
-		this.errors = errors;
+
+	public void setExceptionType(String exceptionType) {
+		this.exceptionType = exceptionType;
 	}
+
 }

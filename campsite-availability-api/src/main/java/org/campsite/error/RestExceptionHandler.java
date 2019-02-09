@@ -28,7 +28,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
      * This is a custom handler related to missing start or end date parameter
      */
     @ExceptionHandler(value = ParameterMissingException.class)
-    public ResponseEntity<Object> exception(ParameterMissingException ex) {
+    public ResponseEntity<Object> handleParameterMissing(ParameterMissingException ex) {
     	ErrorMessage err = new ErrorMessage(HttpStatus.NOT_ACCEPTABLE, "Missing start or end date parameter", "Missing Parameter Exception");
     	return new ResponseEntity<>(err, HttpStatus.NOT_ACCEPTABLE);
     }    

@@ -3,8 +3,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.bson.types.ObjectId;
+import org.campsite.error.MaxReservationDaysException;
+import org.campsite.error.RequestReservationTimeException;
+import org.campsite.error.ReservationDatesNotAvailableException;
 import org.campsite.model.Reservation;
 import org.campsite.model.ReservationRepository;
 import org.campsite.model.ReservationRequest;
@@ -12,6 +16,8 @@ import org.hashids.Hashids;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
+import com.google.gson.Gson;
  
 @Service
 public class ReservationService {
@@ -39,9 +45,9 @@ public class ReservationService {
 	 		
 			Calendar endDateCal = Calendar.getInstance();
 			endDateCal.setTime(item.getEndDate());
-			endDateCal.add(Calendar.HOUR_OF_DAY, 23);
-			endDateCal.add(Calendar.MINUTE, 59);
-			endDateCal.add(Calendar.SECOND, 59);
+			endDateCal.set(Calendar.HOUR_OF_DAY, 23);
+			endDateCal.set(Calendar.MINUTE, 59);
+			endDateCal.set(Calendar.SECOND, 59);
 			
 	    	Reservation res = new Reservation(objectId, 
 	    									  bookIdentification, 
@@ -52,9 +58,8 @@ public class ReservationService {
 	    									  new Date());
 	    	reservationRepository.save(res);
     	}else {
-    		//TODO
-    		for(Date dt: list)
-    			System.out.println("Reserved date: " + dt);
+    		String jsonFormat = new Gson().toJson(list);
+    		throw new ReservationDatesNotAvailableException(jsonFormat);
     	}
     }
     
@@ -67,9 +72,9 @@ public class ReservationService {
     	if(list.size()==0) {
 			Calendar endDateCal = Calendar.getInstance();
 			endDateCal.setTime(item.getEndDate());
-			endDateCal.add(Calendar.HOUR_OF_DAY, 23);
-			endDateCal.add(Calendar.MINUTE, 59);
-			endDateCal.add(Calendar.SECOND, 59);
+			endDateCal.set(Calendar.HOUR_OF_DAY, 23);
+			endDateCal.set(Calendar.MINUTE, 59);
+			endDateCal.set(Calendar.SECOND, 59);
 			
 		    res.setFullName(item.getFullName()); 
 		    res.setEmail(item.getEmail());
@@ -78,9 +83,8 @@ public class ReservationService {
 		    res.setRequestCreationDate(new Date());
 	    	reservationRepository.save(res);
     	}else {
-    		//TODO
-    		for(Date dt: list)
-    			System.out.println("Reserved date: " + dt);
+    		String jsonFormat = new Gson().toJson(list);
+    		throw new ReservationDatesNotAvailableException(jsonFormat);
     	}
     }    
     
@@ -128,19 +132,20 @@ public class ReservationService {
     	return list;
     }    
     
-    
-    
-/*    private boolean comparePeriod(Date newStart, Date newEnd, Date currentStart, Date currentEnd) {
+    public void checkRequestConditions(Date startDate, Date endDate) {
     	
-    	Calendar currentEndCal = Calendar.getInstance();   	
-    	currentEndCal.setTime(currentEnd); 	
-    	currentEndCal.set(Calendar.HOUR, 0);
-    	currentEndCal.set(Calendar.MINUTE, 0);
-    	currentEndCal.set(Calendar.SECOND, 0);
-    	
-    	if(newStart.compareTo(currentStart)==0 || newEnd.compareTo(currentEndCal.getTime())==0)
-    		return true;
-    	return true;
-    }*/
+    	// The campsite can be reserved for max 3 days.
+    	long x = TimeUnit.DAYS.convert((endDate.getTime() - startDate.getTime()), TimeUnit.MILLISECONDS);
+    	if(x>2 || x <=0)
+    		throw new MaxReservationDaysException();
+
+    	// The campsite can be reserved minimum 1 day(s) ahead of arrival and up to 1 month in advance
+    	Calendar tempCal = Calendar.getInstance();
+    	tempCal.setTime(new Date());
+    	tempCal.add(Calendar.MONTH, 1);
+    	if((startDate.compareTo(new Date())<=0) || (startDate.compareTo(tempCal.getTime())>0))
+    		throw new RequestReservationTimeException();
+
+    }
      
 }

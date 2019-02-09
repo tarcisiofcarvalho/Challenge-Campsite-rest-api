@@ -21,11 +21,11 @@ public class Reservation{
 	private String email;
 	
 	@DateTimeFormat(iso = ISO.DATE)
-	@JsonFormat(timezone="GMT-3")
+	//@JsonFormat(timezone="GMT-3")
 	private Date startDate;
 	
 	@DateTimeFormat(iso = ISO.DATE)
-	@JsonFormat(timezone="GMT-3")
+	//@JsonFormat(timezone="GMT-3")
 	private Date endDate;
 	
 	@DateTimeFormat(iso = ISO.DATE_TIME)

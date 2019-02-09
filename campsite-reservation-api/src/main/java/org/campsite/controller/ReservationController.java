@@ -40,14 +40,10 @@ public class ReservationController {
 	 */
     @PostMapping
     public ResponseEntity<Object> addReservation(@Valid @RequestBody ReservationRequest rr) {
-
-    	try {
-    		service.save(rr); 
-		} catch (Exception e) {
-			//TODO log
-			e.printStackTrace();
-			return new ResponseEntity<Object>("unexpected error", HttpStatus.NOT_MODIFIED);
-		}	
+    	
+    	service.checkRequestConditions(rr.getStartDate(), rr.getEndDate());
+    	
+    	service.save(rr); 
     	
     	return new ResponseEntity<Object>("Reservation Added", HttpStatus.CREATED);
     }
@@ -60,14 +56,10 @@ public class ReservationController {
 	 */
     @PutMapping(path="/{bookingIdentifier}")
     public ResponseEntity<Object> updateReservation(@Valid @RequestBody ReservationRequest reservationItem, @PathVariable String bookingIdentifier) {
-    	try {
-    		service.update(reservationItem,bookingIdentifier); 
-		} catch (Exception e) {
-			//TODO log
-			e.printStackTrace();
-			return new ResponseEntity<Object>("unexpected error", HttpStatus.NOT_MODIFIED);
-		}	
-    	
+    	service.checkRequestConditions(reservationItem.getStartDate(), reservationItem.getEndDate());
+
+    	service.update(reservationItem,bookingIdentifier); 
+   	
     	return new ResponseEntity<Object>("Reservation updated", HttpStatus.OK);
  
     }    
@@ -79,17 +71,11 @@ public class ReservationController {
 	 */
     @DeleteMapping(path="/{bookingIdentifier}")
     public ResponseEntity<Object> cancelReservation(@PathVariable String bookingIdentifier) {
-    	try {
-    		service.delete(bookingIdentifier); 
-		} catch (Exception e) {
-			//TODO log
-			e.printStackTrace();
-			return new ResponseEntity<Object>("unexpected error", HttpStatus.NOT_MODIFIED);
-		}	
-    	
+     	
+    	service.delete(bookingIdentifier); 
+   	
     	return new ResponseEntity<Object>("Reservation cancelled", HttpStatus.OK);    	
-    	
-    	
+
     }   
     
 }

@@ -39,7 +39,12 @@
 		  <groupId>org.hashids</groupId>
 		  <artifactId>hashids</artifactId>
 		  <version>1.0.3</version>
-	 </dependency>     	
+	 </dependency>  
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <scope>compile</scope>
+    </dependency>	    	
   </dependencies>
   <build>
     <finalName>campsite</finalName>

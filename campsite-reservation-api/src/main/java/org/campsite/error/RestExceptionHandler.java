@@ -19,6 +19,34 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
         super();
     }
 
+    
+    /**
+     * This is a custom handler related to max reservation days exception
+     */
+    @ExceptionHandler(value = MaxReservationDaysException.class)
+    public ResponseEntity<Object> handleMaxReservationDays(MaxReservationDaysException ex) {
+    	ErrorMessage err = new ErrorMessage(HttpStatus.NOT_ACCEPTABLE, "You are request exceed the limit max 3 days of reservation. Please adjust your request", "Max Reservation Days Exception");
+    	return new ResponseEntity<>(err, HttpStatus.NOT_ACCEPTABLE);
+    }     
+    
+    /**
+     * This is a custom handler related to when the request is out of time limit permitted 
+     */
+    @ExceptionHandler(value = RequestReservationTimeException.class)
+    public ResponseEntity<Object> handleRequestReservationTime(RequestReservationTimeException ex) {
+    	ErrorMessage err = new ErrorMessage(HttpStatus.NOT_ACCEPTABLE, "The campsite can be reserved minimum 1 day(s) ahead of arrival and up to 1 month in advance. Please adjust your request", "Reservation Request Time Limited Exception");
+    	return new ResponseEntity<>(err, HttpStatus.NOT_ACCEPTABLE);
+    }  
+
+    /**
+    * This is a custom handler related to when the request is out of time limit permitted 
+    */
+   @ExceptionHandler(value = ReservationDatesNotAvailableException.class)
+   public ResponseEntity<Object> handleReservationDaysNotAvailable(ReservationDatesNotAvailableException ex) {
+   	ErrorMessage err = new ErrorMessage(HttpStatus.NOT_ACCEPTABLE, "The date(s) : " + ex.getMessage() + " are not available for your reservation. Please adjust your request", "Reservation Dates not Available Exception");
+   	return new ResponseEntity<>(err, HttpStatus.NOT_ACCEPTABLE);
+   }      
+    
     // API
 
     // 400

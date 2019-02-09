@@ -2,6 +2,7 @@
 
 import javax.validation.Valid;
 
+import org.campsite.model.Reservation;
 import org.campsite.model.ReservationRequest;
 import org.campsite.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,9 @@ public class ReservationController {
     	
     	service.checkRequestConditions(rr.getStartDate(), rr.getEndDate());
     	
-    	service.save(rr); 
+    	Reservation rs = service.save(rr); 
     	
-    	return new ResponseEntity<Object>("Reservation Added", HttpStatus.CREATED);
+    	return new ResponseEntity<Object>(rs, HttpStatus.CREATED);
     }
     
 	/**
@@ -60,7 +61,7 @@ public class ReservationController {
 
     	service.update(reservationItem,bookingIdentifier); 
    	
-    	return new ResponseEntity<Object>("Reservation updated", HttpStatus.OK);
+    	return new ResponseEntity<Object>("Reservation Updated", HttpStatus.OK);
  
     }    
   

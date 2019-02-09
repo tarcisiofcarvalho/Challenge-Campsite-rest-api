@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.bson.types.ObjectId;
+import org.campsite.error.BookingIdentifierInvalidException;
 import org.campsite.error.MaxReservationDaysException;
 import org.campsite.error.RequestReservationTimeException;
 import org.campsite.error.ReservationDatesNotAvailableException;
@@ -29,19 +30,28 @@ public class ReservationService {
   	  SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this); 
 	}
     
+    /**
+     * Delete all reservations
+     */
     public void deleteAll() {
     	reservationRepository.deleteAll();
     }
 
-    public void save(ReservationRequest item) {
+    /**
+     * Save a reservation
+     * @param item
+     * @return
+     */
+    public Reservation save(ReservationRequest item) {
     	
+    	String bookIdentification = null;
     	
     	List<Date> list = getReservedDates(item.getStartDate(),item.getEndDate());
     	
     	if(list.size()==0) {
 	    	ObjectId objectId = ObjectId.get();    	
 			Hashids hashids = new Hashids(objectId.toString(),8);
-			String bookIdentification = hashids.encode(1L);
+			bookIdentification = hashids.encode(1L);
 	 		
 			Calendar endDateCal = Calendar.getInstance();
 			endDateCal.setTime(item.getEndDate());
@@ -61,11 +71,20 @@ public class ReservationService {
     		String jsonFormat = new Gson().toJson(list);
     		throw new ReservationDatesNotAvailableException(jsonFormat);
     	}
+    	
+    	return get(bookIdentification);
     }
     
+    /**
+     * Update a reservation. All fields can be change, except booking identifier
+     * @param item
+     * @param bookingIdentifier
+     */
     public void update(ReservationRequest item, String bookingIdentifier) {
     	
     	Reservation res = reservationRepository.findByBookingIdentifier(bookingIdentifier);
+    	if(res==null)
+    		throw new BookingIdentifierInvalidException(bookingIdentifier); // Exception for non valid BookingIdentifier
     	
     	List<Date> list = getReservedDates(item.getStartDate(),item.getEndDate(),res.getId());
     	
@@ -88,14 +107,30 @@ public class ReservationService {
     	}
     }    
     
+    /**
+     * Delete a reservation 
+     * @param bookingIdentifier
+     */
     public void delete(String bookingIdentifier) {
     	reservationRepository.deleteByBookingIdentifier(bookingIdentifier);
     }
     
+    /**
+     * Return a Reservation by booking identifier 
+     * @param bookingIdentifier
+     * @return Reservation
+     */
     public Reservation get(String bookingIdentifier) {
     	return reservationRepository.findByBookingIdentifier(bookingIdentifier);
     }
-    
+
+    /**
+     * Compare the list os requested dates reservation and compares with current reserved dates and return non available dates list
+     * @param startDate
+     * @param endDate
+     * @param id
+     * @return List<Date>
+     */
     public List<Date> getReservedDates(Date startDate, Date endDate) {
 		List<Date> list = new ArrayList<Date>();
 		
@@ -114,6 +149,13 @@ public class ReservationService {
     	return list;
     }
     
+    /**
+     * Compare the list os requested dates reservation and compares with current reserved dates and return non available dates list, except for the current booking identifier
+     * @param startDate
+     * @param endDate
+     * @param id
+     * @return List<Date>
+     */
     public List<Date> getReservedDates(Date startDate, Date endDate, ObjectId id) {
 		List<Date> list = new ArrayList<Date>();
 		
@@ -130,8 +172,13 @@ public class ReservationService {
 			startDateCal.add(Calendar.DATE, 1);
 		}   	
     	return list;
-    }    
+    }  
     
+    /**
+     * Check if the requested reservation is less than equal 3 days and if the campsite reservation start date is minimum 1 day(s) ahead of arrival and up to 1 month in advance
+     * @param startDate
+     * @param endDate
+     */
     public void checkRequestConditions(Date startDate, Date endDate) {
     	
     	// The campsite can be reserved for max 3 days.

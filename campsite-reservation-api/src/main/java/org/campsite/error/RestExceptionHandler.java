@@ -1,8 +1,6 @@
 package org.campsite.error;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,71 +39,38 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
     /**
     * This is a custom handler related to when the request is out of time limit permitted 
     */
-   @ExceptionHandler(value = ReservationDatesNotAvailableException.class)
-   public ResponseEntity<Object> handleReservationDaysNotAvailable(ReservationDatesNotAvailableException ex) {
-   	ErrorMessage err = new ErrorMessage(HttpStatus.NOT_ACCEPTABLE, "The date(s) : " + ex.getMessage() + " are not available for your reservation. Please adjust your request", "Reservation Dates not Available Exception");
-   	return new ResponseEntity<>(err, HttpStatus.NOT_ACCEPTABLE);
-   }      
+    @ExceptionHandler(value = ReservationDatesNotAvailableException.class)
+    public ResponseEntity<Object> handleReservationDaysNotAvailable(ReservationDatesNotAvailableException ex) {
+    	ErrorMessage err = new ErrorMessage(HttpStatus.NOT_ACCEPTABLE, "The date(s) : " + ex.getMessage() + " are not available for your reservation. Please adjust your request", "Reservation Dates not Available Exception");
+    	return new ResponseEntity<>(err, HttpStatus.NOT_ACCEPTABLE);
+    }      
     
-    // API
+    /**
+    * This is a custom handler related to when was passed a non valid booking identifier 
+    */
+   @ExceptionHandler(value = BookingIdentifierInvalidException.class)
+   public ResponseEntity<Object> handleBookingIdentifierInvalid(BookingIdentifierInvalidException ex) {
+   	 ErrorMessage err = new ErrorMessage(HttpStatus.BAD_REQUEST, "The booking identifier: " + ex.getMessage() + " is not valid, please verify.", "Invalid Booking Identifier Exception");
+     return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+   }
 
-    // 400
+   @ExceptionHandler({ DataIntegrityViolationException.class })
+   public ResponseEntity<Object> handleBadRequest(final DataIntegrityViolationException ex, final WebRequest request) {
+ 	   ErrorMessage err = new ErrorMessage(HttpStatus.BAD_REQUEST, "Data Integrity Error. Please check if all JSON field were filled correctly", ex.getCause().getMessage());
+       return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+   }
+     
 
-    @ExceptionHandler({ DataIntegrityViolationException.class })
-    public ResponseEntity<Object> handleBadRequest(final DataIntegrityViolationException ex, final WebRequest request) {
-        final String bodyOfResponse = "Data Integrity Error. Please check if all JSON field were filled correctly";
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-    }
-    
-/*    @ExceptionHandler({ MethodArgumentNotValidException.class })
-    public ResponseEntity<Object> handleNotValidArgument(final MethodArgumentNotValidException ex, final WebRequest request) {
-        List<String> errors = new ArrayList<String>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.add(error.getField() + ": " + error.getDefaultMessage());
-        }
-        for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-            errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
-        }
-    	
-        ErrorMessage apiError = new ErrorMessage(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage(), errors);
-        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
-    } */   
+   @Override
+   protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+ 	   ErrorMessage err = new ErrorMessage(HttpStatus.BAD_REQUEST, "There is something wrong with the structure of JSON passed, please review it.", ex.getCause().getMessage());
+       return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+   }
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(final HttpMessageNotReadableException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
-        final String bodyOfResponse = "There is something wrong with the structure of JSON passed, please review it.";
-        return handleExceptionInternal(ex, bodyOfResponse, headers, HttpStatus.BAD_REQUEST, request);
-    }
+   @Override
+   protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+ 	   ErrorMessage err = new ErrorMessage(HttpStatus.BAD_REQUEST, "It is missing some json field or the field name is incorrect", ex.getCause().getMessage());
+       return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);       
+   }
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(final MethodArgumentNotValidException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
-        final String bodyOfResponse = "It is missing some json field or the field name is incorrect";
-        return handleExceptionInternal(ex, bodyOfResponse, headers, HttpStatus.BAD_REQUEST, request);
-    }
-
-/*    // 403
-    @ExceptionHandler({ AccessDeniedException.class })
-    public ResponseEntity<Object> handleAccessDeniedException(final Exception ex, final WebRequest request) {
-        System.out.println("request" + request.getUserPrincipal());
-        return new ResponseEntity<Object>("Access denied message here", new HttpHeaders(), HttpStatus.FORBIDDEN);
-    }*/
-
-    // 409
-
-    @ExceptionHandler({ InvalidDataAccessApiUsageException.class, DataAccessException.class })
-    protected ResponseEntity<Object> handleConflict(final RuntimeException ex, final WebRequest request) {
-        final String bodyOfResponse = "This should be application specific";
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
-    }
-
-    // 412
-
-    // 500
-
-    @ExceptionHandler({ NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class })
-    /*500*/public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
-        logger.error("500 Status Code", ex);
-        final String bodyOfResponse = "This should be application specific";
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
-    }
 }

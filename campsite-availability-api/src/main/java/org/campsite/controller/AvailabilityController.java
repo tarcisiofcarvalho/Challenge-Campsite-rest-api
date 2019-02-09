@@ -35,26 +35,18 @@ public class AvailabilityController {
     public ResponseEntity<Object> getAvailabilities(@Valid @Nullable @RequestParam("startDate") @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date startDate, 
     												@Valid @Nullable @RequestParam("endDate") @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date endDate) {
     	List<Date> list;
- //   	try {
-    		
-    		if(startDate==null && !(endDate==null)) { // Exception in case just start date was passed as parameter
-    			throw new ParameterMissingException();
-    		}else if(!(startDate==null )&& endDate==null) { // Exception in case just end date was passed as parameter
-    			throw new ParameterMissingException();
-    		}else if(startDate==null || endDate==null) { // In case both parameters are null, the system will use default dates
-    			startDate=getDefaultStartDate();
-    			endDate=getDefaultEndDate();
-    		}
-    	
-    		// Processing request to get available dates
-    		list = service.getAvailableDates(startDate, endDate);
-		
-/*    	} catch (Exception e) {
-			//TODO log
-			e.printStackTrace();
-			return new ResponseEntity<Object>("unexpected error", HttpStatus.NOT_MODIFIED);
-		}*/	
-    	
+
+    	// Conditions validation
+		if(startDate==null && !(endDate==null)) { // Exception in case just start date was passed as parameter
+			throw new ParameterMissingException();
+		}else if(!(startDate==null )&& endDate==null) { // Exception in case just end date was passed as parameter
+			throw new ParameterMissingException();
+		}else if(startDate==null || endDate==null) { // In case of both parameters are null, the system will use the default dates
+			startDate=getDefaultStartDate();
+			endDate=getDefaultEndDate();
+		}
+    	list = service.getAvailableDates(startDate, endDate);
+
     	return new ResponseEntity<Object>(list, HttpStatus.OK);
     }
     

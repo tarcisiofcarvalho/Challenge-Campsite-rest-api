@@ -47,7 +47,7 @@
     </dependency>	    	
   </dependencies>
   <build>
-    <finalName>campsite</finalName>
+    <finalName>campsite-reservation</finalName>
     <plugins>
        <plugin>
            <groupId>org.springframework.boot</groupId>

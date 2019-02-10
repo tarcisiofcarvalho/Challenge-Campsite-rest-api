@@ -3,12 +3,12 @@
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.campsite.error.ParameterMissingException;
+import org.campsite.model.AvailableDate;
 import org.campsite.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,11 +30,10 @@ public class AvailabilityController {
 	@Autowired
 	private ReservationService service;
 	
-    @GetMapping
+    @GetMapping(produces="application/json")
     @Valid
     public ResponseEntity<Object> getAvailabilities(@Valid @Nullable @RequestParam("startDate") @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date startDate, 
     												@Valid @Nullable @RequestParam("endDate") @DateTimeFormat(pattern="yyyy-MM-dd") @JsonFormat(timezone="GMT-3") Date endDate) {
-    	List<Date> list;
 
     	// Conditions validation
 		if(startDate==null && !(endDate==null)) { // Exception in case just start date was passed as parameter
@@ -45,9 +44,10 @@ public class AvailabilityController {
 			startDate=getDefaultStartDate();
 			endDate=getDefaultEndDate();
 		}
-    	list = service.getAvailableDates(startDate, endDate);
+		
+		AvailableDate availableDate = new AvailableDate(service.getAvailableDates(startDate, endDate));
 
-    	return new ResponseEntity<Object>(list, HttpStatus.OK);
+    	return new ResponseEntity<Object>(availableDate, HttpStatus.OK);
     }
     
 
